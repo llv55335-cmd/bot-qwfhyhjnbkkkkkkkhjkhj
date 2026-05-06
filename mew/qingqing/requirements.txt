@@ -1,0 +1,111 @@
+# ==================================================================
+# Qingqing 后端依赖清单
+# ==================================================================
+# 安装：pip install -r requirements.txt
+# 建议在 venv 里装：python -m venv .venv && source .venv/bin/activate
+# Python 版本：>= 3.10
+# ==================================================================
+
+
+# ---------- HTTP 框架（合并后用 FastAPI 替代 Flask） ----------
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+
+
+# ---------- HTTP 客户端 ----------
+httpx>=0.27.0
+
+
+# ---------- 配置 ----------
+python-dotenv>=1.0.0
+
+
+# ---------- 飞书 SDK ----------
+lark-oapi>=1.2.0
+
+
+# ---------- 网页抓取 ----------
+trafilatura>=1.6.0
+
+
+# ---------- WebSocket 客户端（Polly 玩具用） ----------
+websocket-client>=1.6.0
+
+
+# ---------- 记忆系统：向量模型与向量库 ----------
+sentence-transformers>=2.2.0
+sqlite-vec>=0.1.0
+
+
+# ==================================================================
+# 以下是间接依赖，pip 会自动装上，列出来仅供参考
+# ==================================================================
+
+# fastapi 带的：
+# - starlette
+# - pydantic >= 2.0
+# - typing-extensions
+
+# uvicorn[standard] 带的：
+# - h11
+# - watchfiles
+# - websockets
+# - httptools
+# - uvloop（仅 Linux/macOS）
+
+# sentence-transformers 带的（重量级）：
+# - torch
+# - transformers
+# - tokenizers
+# - numpy
+# - scipy
+# - scikit-learn
+# - huggingface-hub
+
+# trafilatura 带的：
+# - lxml
+# - charset-normalizer
+# - htmldate
+# - justext
+# - courlan
+
+
+# ==================================================================
+# 删除项 vs 保留项说明
+# ==================================================================
+
+# ❌ 不再需要（合并后被 FastAPI 替代）：
+#    flask
+#    flask-cors
+
+# ❌ 不再需要（用 httpx 统一）：
+#    requests（如果之前在用，全部换成 httpx）
+
+# ✅ 保留（功能不可替代）：
+#    httpx           — 异步 HTTP 客户端，飞书 + 论坛 + AI 调用都用它
+#    lark-oapi       — 飞书官方 SDK，websocket 长连接走这个
+#    trafilatura     — 网页正文提取
+#    websocket-client— Polly 那边用的同步 WebSocket
+#    sqlite-vec      — sqlite 的向量插件
+#    sentence-transformers — paraphrase-multilingual-MiniLM-L12-v2 模型
+
+
+# ==================================================================
+# 平台特殊说明
+# ==================================================================
+
+# Windows 用户：
+#   - uvicorn[standard] 在 Windows 装不上 uvloop，会自动跳过，不影响功能
+#   - sentence-transformers 首次启动会下载约 500MB 模型到 ~/.cache/huggingface/
+
+# VPS / Docker 部署：
+#   - 内存建议 ≥ 2GB（sentence-transformers 加载后约占 500MB）
+#   - Python base image 建议用 python:3.11-slim
+#   - 如果不打算用向量检索（先只跑 HTTP 工具部分），可以注释掉
+#     sentence-transformers 和 sqlite-vec 两行，启动会快很多
+
+# 国内镜像加速：
+#   pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 如果 sentence-transformers 模型下载慢，配 hf 镜像：
+#   export HF_ENDPOINT=https://hf-mirror.com
